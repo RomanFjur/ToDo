@@ -3,13 +3,20 @@ class ToDoForm {
     this.selector = selector;
   }
 
+  createForm () {
+    let form = document.createElement('form');
+    form.classList.add('form');
+    this.selector.append(form);
+    this.form = form;
+  }
+
   createNameInput () {
     let nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.name = 'name';
     nameInput.placeholder = 'My new todo';
     nameInput.classList.add('input');
-    this.selector.append(nameInput);
+    this.form.append(nameInput);
     this.nameInput = nameInput;
   }
 
@@ -19,7 +26,7 @@ class ToDoForm {
     tagsInput.name = 'tags';
     tagsInput.placeholder = 'todo, important, other...';
     tagsInput.classList.add('input');
-    this.selector.append(tagsInput);
+    this.form.append(tagsInput);
     this.tagsInput = tagsInput;
   }
 
@@ -28,7 +35,7 @@ class ToDoForm {
     submitButton.type = 'button';
     submitButton.textContent = 'Create';
     submitButton.classList.add('button');
-    this.selector.append(submitButton);
+    this.form.append(submitButton);
     this.submit = submitButton;
   }
 
@@ -42,10 +49,15 @@ class ToDoForm {
     console.log(this.tagsInputValue);
   }
 
+  cleanInputs () {
+    this.nameInput.value = '';
+    this.tagsInput.value = '';
+  }
+
   getValues () {
     this.getNameInputValue();
     this.getTagsInputValue();
-    console.log('сработало');
+    this.cleanInputs();
   }
 }
 
@@ -53,6 +65,7 @@ let toDoForm = new ToDoForm(document.querySelector('body'));
 
 // --------------------------------------
 // Это будет работать в последнем классе!
+toDoForm.createForm();
 toDoForm.createNameInput();
 toDoForm.createTagsInput();
 toDoForm.createSubmitButton();
@@ -63,15 +76,38 @@ toDoForm.submit.addEventListener('click', () => {
 // --------------------------------------
 
 class ToDoList {
-  constructor(selector, initialState = []) {
+  constructor(selector) {
+    this.selector = selector;
+  }
+
+  createToDoList () {
+    let toDoList = document.createElement('div');
+    toDoList.classList.add('toDoList');
+    this.selector.append(toDoList);
+  }
+
+  createToDoName () {
 
   }
-  //Methods
+
+  createToDoTags () {
+
+  }
+
+  createDoneCheckboxes () {
+
+  }
+
+  createDeleteButtons () {
+
+  }
 }
+
+let toDoList = new ToDoList(document.querySelector('body'));
+toDoList.createToDoList();
 
 class ToDosHandle {
   constructor() {
 
   }
-  //Methods
 }
