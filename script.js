@@ -57,7 +57,9 @@ class ToDoForm {
     this.tagsInput.value = '';
   }
 
-  setOnSubmit(arr) {
+  setOnSubmit(obj) {
+    let arr = [];
+    arr.push(obj);
     toDoList.addToDoItem(arr);
   }
 }
@@ -66,20 +68,25 @@ class ToDoList {
   constructor(selector, initialState = []) {
     this.selector = selector;
     this.rootElement = selector();
-    
+
     let list = document.createElement('div');
     list.classList.add('list');
     this.rootElement.append(list);
     this.list = list;
 
-    this.toDoItems = [{name: 'Roma', tags: 'ram, pam, tam'}];
-    this.renderToDoItem();
+    this.toDoItems = [...initialState];
   }
 
   // все равно не работает =(
-  // set toDoItems(value) {
-  //   this.checkIsEmpty();
-  // }
+
+  get toDoItems (){
+    return this._toDoItems;
+  }
+
+  set toDoItems(value) {
+    this._toDoItems = value;
+    this.checkIsEmpty();
+  }
 
   checkIsEmpty() {
     if (!this.toDoItems || this.toDoItems.length === 0) {
@@ -100,20 +107,24 @@ class ToDoList {
   }
 
   renderToDoItems() {
-
+    // Пока не продумывал
   }
 
   renderToDoItem() {
-    //this.deleteEmptyLabel();
+    this.deleteEmptyLabel();
 
     const toDo = document.createElement('div'),
-          toDoCheckbox = document.createElement('checkbox'),
+          toDoCheckbox = document.createElement('input'),
+          toDoDiv = document.createElement('div'),
           toDoName = document.createElement('p'),
           toDoTags = document.createElement('p'),
           toDoDeleteButton = document.createElement('button');
 
+    toDoCheckbox.type = 'checkbox';
+
     toDo.classList.add('toDo');
     toDoCheckbox.classList.add('checkbox');
+    toDoDiv.classList.add('toDoItem');
     toDoName.classList.add('name');
     toDoTags.classList.add('tags');
     toDoDeleteButton.classList.add('delete');
@@ -124,16 +135,16 @@ class ToDoList {
 
     this.list.append(toDo);
     toDo.append(toDoCheckbox);
-    toDo.append(toDoName);
-    toDo.append(toDoTags);
+    toDo.append(toDoDiv);
+    toDoDiv.append(toDoName);
+    toDoDiv.append(toDoTags);
     toDo.append(toDoDeleteButton);
   }
 
+  // Неправильно, но пока как кастыль
   addToDoItem(arr) {
-    // Намудрил в создании массива
-    let newArr = [];
-    newArr.push(arr);
-    this.toDoItems = newArr;
+    this.toDoItems = arr;
+    this.renderToDoItem();
   }
 }
 

@@ -78,3 +78,39 @@ body {
   background-color: #fff;
   box-sizing: border-box;
 }
+
+.emptyList {
+  display: block;
+  margin: 0;
+  margin-top: 222px;
+  margin-left: 55px;
+}
+
+.toDo {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  margin-left: 25px;
+  margin-top: 25px;
+}
+
+.checkbox {
+  margin-right: 10px;
+}
+
+.toDoItem {
+  margin-right: 15px;
+}
+
+.delete {
+  display: block;
+  width: 10px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.tags {
+  font-size: 13px;
+  line-height: 16px;
+}
