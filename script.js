@@ -13,12 +13,17 @@ class ToDoForm {
     this.form = form;
 
     // Create <input> for name of ToDo in DOM;
+    let nameLabel = document.createElement('label');
+    nameLabel.for = 'name';
+    nameLabel.textContent = 'Name';
+    nameLabel.classList.add('label');
     let nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.name = 'name';
+    nameInput.id = 'name';
     nameInput.placeholder = 'My new todo';
     nameInput.classList.add('input');
-    this.form.append(nameInput);
+    this.form.append(nameLabel);
+    nameLabel.append(nameInput);
     nameInput.addEventListener('input', (e) => {
       this.valueName = e.target.value;
       console.log(this.valueName);
@@ -26,12 +31,17 @@ class ToDoForm {
     this.nameInput = nameInput;
 
     // Create <input> for tags of ToDo in DOM;
+    let tagsLabel = document.createElement('label');
+    tagsLabel.for = 'tags';
+    tagsLabel.textContent = 'Tags';
+    tagsLabel.classList.add('label');
     let tagsInput = document.createElement('input');
     tagsInput.type = 'text';
-    tagsInput.name = 'tags';
+    tagsInput.id = 'tags';
     tagsInput.placeholder = 'todo, important, other...';
     tagsInput.classList.add('input');
-    this.form.append(tagsInput);
+    this.form.append(tagsLabel);
+    tagsLabel.append(tagsInput);
     tagsInput.addEventListener('input', (e) => {
       this.valueTags = e.target.value;
       console.log(this.valueTags);
