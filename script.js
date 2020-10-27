@@ -54,7 +54,7 @@ class ToDoForm {
     submitButton.textContent = 'Create';
     submitButton.classList.add('button');
     submitButton.addEventListener('click', () => {
-      this.setOnSubmit({name: this.valueName, tags: this.valueTags});
+      this.onSubmit({name: this.valueName, tags: this.valueTags});
       this.cleanInputs();
     });
     this.form.append(submitButton);
@@ -67,11 +67,16 @@ class ToDoForm {
     this.tagsInput.value = '';
   }
 
-  setOnSubmit(obj) {
-    let arr = [];
-    arr.push(obj);
-    toDoList.addToDoItem(arr);
+  setOnSubmit(func) {
+    this.submitFunc = func;
   }
+
+  onSubmit (obj) {
+    if (this.submitFunc) {
+      this.submitFunc(obj);
+    }
+  }
+  // 1. setOnSubmit Должен принимать функцию
 }
 
 class ToDoList {
@@ -87,8 +92,6 @@ class ToDoList {
     this.toDoItems = [...initialState];
   }
 
-  // все равно не работает =(
-
   get toDoItems (){
     return this._toDoItems;
   }
@@ -98,12 +101,14 @@ class ToDoList {
     this.checkIsEmpty();
   }
 
+  // check for empty array toDoItems (if empty - call render method)
   checkIsEmpty() {
     if (!this.toDoItems || this.toDoItems.length === 0) {
       this.renderEmptyLabel();
     }
   }
 
+  // nethod to render string with message about empty todolist
   renderEmptyLabel() {
     let messageOfEmpty = document.createElement('p');
     messageOfEmpty.textContent = "You don't need to do anything!";
@@ -121,11 +126,11 @@ class ToDoList {
   }
 
   renderToDoItem() {
-    this.deleteEmptyLabel();
 
     const toDo = document.createElement('div'),
+          checkboxLabel = document.createElement('label'),
+          checkboxSpan = document.createElement('span'),
           toDoCheckbox = document.createElement('input'),
-          toDoDiv = document.createElement('div'),
           toDoName = document.createElement('p'),
           toDoTags = document.createElement('p'),
           toDoDeleteButton = document.createElement('button');
@@ -133,30 +138,61 @@ class ToDoList {
     toDoCheckbox.type = 'checkbox';
 
     toDo.classList.add('toDo');
+    checkboxLabel.classList.add('checkboxLabel');
     toDoCheckbox.classList.add('checkbox');
-    toDoDiv.classList.add('toDoItem');
     toDoName.classList.add('name');
     toDoTags.classList.add('tags');
     toDoDeleteButton.classList.add('delete');
 
-    // Продумать итерацию по массиву
-    toDoName.textContent = `${this.toDoItems[0].name}`;
-    toDoTags.textContent = `${this.toDoItems[0].tags.replace(/^/, '#').replace(/\,\s/gi, ' #')}`;
+    // 1. Разобрать строку tags с помощью регулярки (должен быть массивом)
+    // 2. С помощью reduce собрать строку с тегами из массива с тегами
+
+    toDoName.textContent = `${this.toDoItems[this.toDoItems.length - 1].name}`;
+    toDoTags.textContent = `${this.toDoItems[this.toDoItems.length - 1].tags.replace(/^/, '#').replace(/\,\s/gi, ' #')}`;
 
     this.list.append(toDo);
-    toDo.append(toDoCheckbox);
-    toDo.append(toDoDiv);
-    toDoDiv.append(toDoName);
-    toDoDiv.append(toDoTags);
+    toDo.append(checkboxLabel);
+    checkboxLabel.append(toDoCheckbox);
+    checkboxLabel.append(checkboxSpan);
+    toDo.append(toDoName);
     toDo.append(toDoDeleteButton);
+    toDo.append(toDoTags);
+
+    toDoDeleteButton.addEventListener('click', () => {
+      //Считать сперва данные
+      toDo.remove();
+      console.log(this.toDoItems);
+      // Чистить массив toDoItems!!!
+    });
+
+    // 1. Добавить аргумент toDoItem который использовать в качестве элемента
+    // 2. Самоудаление listener
+    // 3. Добавить функционал ID и его подключение к DOM-елементу и к toDoItems
   }
 
-  // Неправильно, но пока как кастыль
-  addToDoItem(arr) {
-    this.toDoItems = arr;
+  addElement(data) {
+    const array = [...this.toDoItems, data];
+    this.toDoItems = array;
     this.renderToDoItem();
   }
 }
 
-let toDoForm = new ToDoForm(() => document.querySelector('body'));
-let toDoList = new ToDoList(() => document.querySelector('body'));
+class IdGenerator {
+  static getNewId(length = 10) {
+    // let newId = '';
+    // const avaliableSymbols = [];
+  }
+}
+
+const toDoForm = new ToDoForm(() => document.querySelector('body'));
+const toDoList = new ToDoList(() => document.querySelector('body'));
+
+toDoForm.setOnSubmit((data) => {
+  toDoList.addElement(data);
+});
+
+// 1. Добавить удаление элементов
+// 2. Добавить функцию GenerateNewId (реализацию)
+// 3. Добавить id (в массив)
+// 4. добавить функцию removeElementById (чистые функции!!! приходит только id!!!)
+// 5. состояние хранить в todoItems (функция toggleIsDoneById)

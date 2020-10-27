@@ -103,17 +103,20 @@ body {
 .toDo {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
   margin: 0;
-  margin-left: 25px;
+  margin-left: 61px;
   margin-top: 25px;
 }
 
-.checkbox {
-  margin-right: 10px;
+.toDo:first-child {
+  margin-top: 40px;
 }
 
-.toDoItem {
-  margin-right: 15px;
+.name {
+  margin-right: 13px;
 }
 
 .delete {
@@ -122,9 +125,62 @@ body {
   height: 12px;
   margin: 0;
   padding: 0;
+  border: none;
+  background-color: #ffffff;
+  background-image: url('assets/img/delete.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .tags {
+  width: 100%;
   font-size: 13px;
   line-height: 16px;
+}
+
+.checkboxLabel {
+  position: relative;
+}
+
+.checkboxLabel > input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.checkboxLabel > input[type='checkbox'] + span:hover::before {
+  cursor: pointer;
+}
+
+.checkboxLabel > span::before {
+  display: block;
+  position: absolute;
+  content: '';
+  top: -12px;
+  left: -34px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e9e9e9;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+/* Исправить отображение нажатого Label */
+.checkboxLabel > input[type='checkbox']:checked + span::after {
+  display: block;
+  position: absolute;
+  content: '';
+  top: -5px;
+  left: -30px;
+  width: 16px;
+  height: 11px;
+  background-image: url('assets/img/check.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.checkboxLabel > input[type='checkbox']:checked ~ .name {
+  text-decoration: line-through;
 }
