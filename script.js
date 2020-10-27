@@ -179,10 +179,17 @@ class ToDoList {
 
 class IdGenerator {
   static getNewId(length = 10) {
-    // let newId = '';
-    // const avaliableSymbols = [];
+    let newId = '';
+    const avaliableSymbols = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+    for (var i = 0; i < length; i++) {
+      let randomSymbol = Math.floor(Math.random()*36);
+      newId = `${newId}${avaliableSymbols[randomSymbol]}`;
+    }
+    console.log(newId);
   }
 }
+
+IdGenerator.getNewId();
 
 const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
