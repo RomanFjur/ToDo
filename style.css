@@ -56,6 +56,15 @@ body {
   color: #c1c1c1;
 }
 
+.inputError {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16),
+              inset 0 0 0 2px rgba(255, 0, 0, 0.7);
+}
+
+.inputError::placeholder {
+  color: rgba(255, 0, 0, 0.7);
+}
+
 .button {
   width: 224px;
   height: 40px;

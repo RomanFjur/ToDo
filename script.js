@@ -36,9 +36,15 @@ class ToDoForm {
     nameInput.classList.add('input');
     this.form.append(nameLabel);
     nameLabel.append(nameInput);
+
     nameInput.addEventListener('input', (e) => {
       this.valueName = e.target.value;
     });
+
+    nameInput.addEventListener('focus', () => {
+      nameInput.classList.remove('inputError');
+    });
+
     this.nameInput = nameInput;
 
     // Create <input> for tags of ToDo in DOM;
@@ -53,9 +59,15 @@ class ToDoForm {
     tagsInput.classList.add('input');
     this.form.append(tagsLabel);
     tagsLabel.append(tagsInput);
+
     tagsInput.addEventListener('input', (e) => {
       this.valueTags = e.target.value;
     });
+
+    tagsInput.addEventListener('focus', () => {
+      tagsInput.classList.remove('inputError');
+    });
+
     this.tagsInput = tagsInput;
 
     // Create <button> for create ToDo items in DOM;
@@ -63,10 +75,20 @@ class ToDoForm {
     submitButton.type = 'button';
     submitButton.textContent = 'Create';
     submitButton.classList.add('button');
+
     submitButton.addEventListener('click', () => {
-      this.onSubmit({name: this.valueName, tags: this.valueTags});
-      this.cleanInputs();
+      if (typeof(this.valueName) === 'undefined' || this.valueName === '') {
+        nameInput.classList.add('inputError');
+        nameInput.placeholder = 'You must enter "todo" name';
+      }  else if (typeof(this.valueTags) === 'undefined' || this.valueTags === '') {
+        tagsInput.classList.add('inputError');
+        tagsInput.placeholder = 'Enter at least one tag';
+      } else {
+        this.onSubmit({name: this.valueName, tags: this.valueTags});
+        this.cleanInputs();
+      }
     });
+
     this.form.append(submitButton);
     this.submit = submitButton;
   }
@@ -75,6 +97,8 @@ class ToDoForm {
   cleanInputs () {
     this.nameInput.value = '';
     this.tagsInput.value = '';
+    this.valueName = '';
+    this.valueTags = '';
   }
 
   setOnSubmit(func) {
