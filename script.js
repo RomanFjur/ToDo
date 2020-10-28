@@ -227,6 +227,7 @@ class ToDoList {
       if (item.id === id) {
         this.toDos[i].remove();
         this.toDos.splice(i, 1);
+        localStorage.removeItem(`todo №${item.todoNumber}`);
         this.toDoItems.splice(i, 1);
         this.toDoItems = this.toDoItems;
       }
@@ -244,7 +245,11 @@ class ToDoList {
       .split(/\s+|,\s+|,+/gi)
       .reduce((sum, current) => sum + ' #' + current)}`;
 
+    // Дополнительно для LocalStorage
+    this.toDoItems[toDoItemIndex].todoNumber = toDoItemIndex + 1;
+
     const toDoItem = this.toDoItems[toDoItemIndex];
+    localStorage.setItem(`todo №${toDoItem.todoNumber}`, toDoItem);
     this.renderToDoItem(toDoItem);
   }
 }
