@@ -139,6 +139,12 @@ body {
   line-height: 16px;
 }
 
+.nameChecked,
+.tagsChecked {
+  text-decoration: line-through;
+  color: rgba(51, 51, 51, 0.3);
+}
+
 .checkboxLabel {
   position: relative;
 }
@@ -179,8 +185,4 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-}
-
-.checkboxLabel > input[type='checkbox']:checked ~ .name {
-  text-decoration: line-through;
 }

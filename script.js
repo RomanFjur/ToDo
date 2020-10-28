@@ -1,3 +1,15 @@
+class IdGenerator {
+  static getNewId(length = 10) {
+    let newId = '';
+    const avaliableSymbols = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+    for (var i = 0; i < length; i++) {
+      let randomSymbol = Math.floor(Math.random()*36);
+      newId = `${newId}${avaliableSymbols[randomSymbol]}`;
+    }
+    return newId;
+  }
+}
+
 class ToDoForm {
   constructor (selector) {
     this.selector = selector;
@@ -26,7 +38,6 @@ class ToDoForm {
     nameLabel.append(nameInput);
     nameInput.addEventListener('input', (e) => {
       this.valueName = e.target.value;
-      console.log(this.valueName);
     });
     this.nameInput = nameInput;
 
@@ -44,7 +55,6 @@ class ToDoForm {
     tagsLabel.append(tagsInput);
     tagsInput.addEventListener('input', (e) => {
       this.valueTags = e.target.value;
-      console.log(this.valueTags);
     });
     this.tagsInput = tagsInput;
 
@@ -89,10 +99,12 @@ class ToDoList {
     this.rootElement.append(list);
     this.list = list;
 
+    this.toDos = [];
+
     this.toDoItems = [...initialState];
   }
 
-  get toDoItems (){
+  get toDoItems() {
     return this._toDoItems;
   }
 
@@ -105,6 +117,8 @@ class ToDoList {
   checkIsEmpty() {
     if (!this.toDoItems || this.toDoItems.length === 0) {
       this.renderEmptyLabel();
+    } else {
+      this.deleteEmptyLabel();
     }
   }
 
@@ -125,7 +139,7 @@ class ToDoList {
     // Пока не продумывал
   }
 
-  renderToDoItem() {
+  renderToDoItem(toDoItem) {
 
     const toDo = document.createElement('div'),
           checkboxLabel = document.createElement('label'),
@@ -144,11 +158,11 @@ class ToDoList {
     toDoTags.classList.add('tags');
     toDoDeleteButton.classList.add('delete');
 
-    // 1. Разобрать строку tags с помощью регулярки (должен быть массивом)
-    // 2. С помощью reduce собрать строку с тегами из массива с тегами
+    // 1. Разобрать строку tags с помощью регулярки (должен быть массивом) +-
+    // 2. С помощью reduce собрать строку с тегами из массива с тегами +-
 
-    toDoName.textContent = `${this.toDoItems[this.toDoItems.length - 1].name}`;
-    toDoTags.textContent = `${this.toDoItems[this.toDoItems.length - 1].tags.replace(/^/, '#').replace(/\,\s/gi, ' #')}`;
+    toDoName.textContent = `${toDoItem.name}`;
+    toDoTags.textContent = `${toDoItem.tags}`;
 
     this.list.append(toDo);
     toDo.append(checkboxLabel);
@@ -158,38 +172,58 @@ class ToDoList {
     toDo.append(toDoDeleteButton);
     toDo.append(toDoTags);
 
-    toDoDeleteButton.addEventListener('click', () => {
-      //Считать сперва данные
-      toDo.remove();
-      console.log(this.toDoItems);
-      // Чистить массив toDoItems!!!
+    toDo.dataset.id = toDoItem.id;
+    this.toDos.push(toDo);
+
+    toDoCheckbox.addEventListener('click', () => {
+      if (toDoItem.toggle == false) {
+        toDoItem.toggle = true;
+        toDoName.classList.toggle('nameChecked');
+        toDoTags.classList.toggle('tagsChecked');
+      } else {
+        toDoItem.toggle = false;
+        toDoName.classList.toggle('nameChecked');
+        toDoTags.classList.toggle('tagsChecked');
+      }
     });
 
-    // 1. Добавить аргумент toDoItem который использовать в качестве элемента
-    // 2. Самоудаление listener
-    // 3. Добавить функционал ID и его подключение к DOM-елементу и к toDoItems
+    toDoDeleteButton.addEventListener('click', () => {
+      this.removeElementById(toDoItem.id);
+      toDoCheckbox.removeEventListener('click', () => {});
+      toDoDeleteButton.removeEventListener('click', () => {});
+    });
+
+    // 1. Добавить аргумент toDoItem который использовать в качестве элемента +
+    // 2. Самоудаление listener +
+    // 3. Добавить функционал ID и его подключение к DOM-елементу и к toDoItems +
+  }
+
+  removeElementById(id) {
+    this.toDoItems.forEach((item, i) => {
+      if (item.id === id) {
+        this.toDos[i].remove();
+        this.toDos.splice(i, 1);
+        this.toDoItems.splice(i, 1);
+        this.toDoItems = this.toDoItems;
+      }
+    });
   }
 
   addElement(data) {
     const array = [...this.toDoItems, data];
     this.toDoItems = array;
-    this.renderToDoItem();
+
+    const toDoItemIndex = this.toDoItems.indexOf(data);
+    this.toDoItems[toDoItemIndex].toggle = false;
+    this.toDoItems[toDoItemIndex].id = IdGenerator.getNewId();
+    this.toDoItems[toDoItemIndex].tags = `#${this.toDoItems[toDoItemIndex].tags
+      .split(/\s+|,\s+|,+/gi)
+      .reduce((sum, current) => sum + ' #' + current)}`;
+
+    const toDoItem = this.toDoItems[toDoItemIndex];
+    this.renderToDoItem(toDoItem);
   }
 }
-
-class IdGenerator {
-  static getNewId(length = 10) {
-    let newId = '';
-    const avaliableSymbols = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-    for (var i = 0; i < length; i++) {
-      let randomSymbol = Math.floor(Math.random()*36);
-      newId = `${newId}${avaliableSymbols[randomSymbol]}`;
-    }
-    console.log(newId);
-  }
-}
-
-IdGenerator.getNewId();
 
 const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
@@ -198,8 +232,8 @@ toDoForm.setOnSubmit((data) => {
   toDoList.addElement(data);
 });
 
-// 1. Добавить удаление элементов
-// 2. Добавить функцию GenerateNewId (реализацию)
-// 3. Добавить id (в массив)
-// 4. добавить функцию removeElementById (чистые функции!!! приходит только id!!!)
-// 5. состояние хранить в todoItems (функция toggleIsDoneById)
+// 1. Добавить удаление элементов +
+// 2. Добавить функцию GenerateNewId (реализацию) +
+// 3. Добавить id (в массив) +
+// 4. добавить функцию removeElementById (чистые функции!!! приходит только id!!!) +-?
+// 5. состояние хранить в todoItems (функция toggleIsDoneById) +
