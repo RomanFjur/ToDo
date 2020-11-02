@@ -1,12 +1,32 @@
 class IdGenerator {
   static getNewId(length = 10) {
-    let newId = '';
+    // let newId = '';
+    // const avaliableSymbols = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+    // for (var i = 0; i < length; i++) {
+    //   let randomSymbolIndex = Math.floor(Math.random() * avaliableSymbols.length);
+    //   newId = `${newId}${avaliableSymbols[randomSymbolIndex]}`;
+    // }
+    // return newId;
+
     const avaliableSymbols = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-    for (var i = 0; i < length; i++) {
-      let randomSymbolIndex = Math.floor(Math.random() * avaliableSymbols.length);
-      newId = `${newId}${avaliableSymbols[randomSymbolIndex]}`;
+
+    function* generateIndexNumber(start, end) {
+      for (let i = start; i < end; i++) {
+        yield Math.floor(Math.random() * avaliableSymbols.length);
+      }
     }
-    return newId;
+
+    function* generateId() {
+      yield* generateIndexNumber(0, 10);
+    }
+
+    let id = '';
+
+    for (let index of generateId()) {
+      id += avaliableSymbols[index];
+    }
+
+    return id;
   }
 }
 
@@ -124,8 +144,6 @@ class ToDoList {
     this.rootElement.append(list);
     this.list = list;
 
-    this.toDos = [];
-
     this.toDoItems = [...initialState];
   }
 
@@ -142,6 +160,12 @@ class ToDoList {
   checkIsEmpty() {
     if (!this.toDoItems || this.toDoItems.length === 0) {
       this.renderEmptyLabel();
+      // if (localStorage.length === 0) {
+      //   this.renderEmptyLabel();
+      // } else {
+      //   this.deleteEmptyLabel();
+      //   toDoSaver.getToDoItems();
+      // }
     } else {
       this.deleteEmptyLabel();
     }
@@ -160,11 +184,11 @@ class ToDoList {
     this.empty.remove();
   }
 
-  renderToDoItems() {
-    // Пока не продумывал
-  }
+  // renderToDoItems() {
+  //
+  // }
 
-  renderToDoItem(toDoItem, onMarkAsDone) {
+  renderToDoItem(toDoItem, onMarkAsDone, removeElementById) {
 
     const toDo = document.createElement('div'),
           checkboxLabel = document.createElement('label'),
@@ -183,12 +207,6 @@ class ToDoList {
     toDoTags.classList.add('tags');
     toDoDeleteButton.classList.add('delete');
 
-    // 1. Разобрать строку tags с помощью регулярки (должен быть массивом) +-
-    // 2. С помощью reduce собрать строку с тегами из массива с тегами +-
-
-    toDoName.textContent = `${toDoItem.name}`;
-    toDoTags.textContent = `${toDoItem.tags}`; // работать с массивом тут
-
     this.list.append(toDo);
     toDo.append(checkboxLabel);
     checkboxLabel.append(toDoCheckbox);
@@ -198,43 +216,46 @@ class ToDoList {
     toDo.append(toDoTags);
 
     toDo.dataset.id = toDoItem.id;
-    this.toDos.push(toDo); // при удалении обратиться к parentNode, считать id
+    toDoName.textContent = `${toDoItem.name}`;
+    toDoTags.textContent = `${toDoItem.tags}`; // работать с массивом тут
+    toDoItem.element = toDo;
 
-    toDoCheckbox.addEventListener('click', () => {
-      if (toDoItem.toggle === false) {
-        toDoItem.toggle = true;
-        toDoName.classList.toggle('nameChecked');
-        toDoTags.classList.toggle('tagsChecked');
-      } else {
-        toDoItem.toggle = false;
-        toDoName.classList.toggle('nameChecked');
-        toDoTags.classList.toggle('tagsChecked');
-      }
-    }); // пока что так, потом переделать (вынести в отдельную функцию) onMarkAsDone!!
+    toDoCheckbox.addEventListener('click', onMarkAsDone);
+    toDoDeleteButton.addEventListener('click', removeElementById);
+  }
 
-    toDoDeleteButton.addEventListener('click', () => {
-      this.removeElementById(toDoItem.id);
-    });
-
-    // 1. Добавить аргумент toDoItem который использовать в качестве элемента +
-    // 2. Самоудаление listener +
-    // 3. Добавить функционал ID и его подключение к DOM-елементу и к toDoItems +
+  onMarkAsDone(item) {
+    if (item.toggle === false || item.toggle === undefined) {
+      item.toggle = true;
+      item.element.classList.toggle('toDoChecked');
+    } else {
+      item.toggle = false;
+      item.element.classList.toggle('toDoChecked');
+    }
   }
 
   removeElementById(id) {
-    this.toDoItems.forEach((item, i) => {
-      if (item.id === id) {
-        this.toDos[i].remove();
-        this.toDos.splice(i, 1);
-        localStorage.removeItem(`todo №${item.todoNumber}`);
-        this.toDoItems.splice(i, 1);
-        this.toDoItems = this.toDoItems;
+    this.toDoItems = this.toDoItems.filter((element, index) => {
+      if (element.id == id) {
+        if (element.element) {
+          element.element.remove();
+          toDoSaver.removeToDoItems(element);
+        } else {
+          this.list.querySelectorAll('.toDo').forEach((item, i) => {
+            if (item.dataset.id == id) {
+              item.remove();
+              toDoSaver.removeToDoItems(element);
+            }
+          });
+        }
       }
+      return element.id != id;
     });
 
-    // 1. Вместо массива toDos - записываем в поле element сам DOM-элемент
-    // 2. Переписываем функцию под filter
-    // для удаления элемента (через remove если поле element есть) или если этого поля нет (начинаем искать с помощью селектора);
+    // 1. Вместо массива toDos - записываем в поле element сам DOM-элемент +
+    // 2. Переписываем функцию под filter +
+    // для удаления элемента (через remove если поле element есть) или если этого поля нет (начинаем искать с
+    // помощью селектора); +-
     // Новый класс для (localStorage) ToDoSaver (getToDoItems и setToDoItems(array));
 
     // ВСЕГДА работаем от данных! Исходя из состояния!
@@ -242,39 +263,65 @@ class ToDoList {
 
   addElement(data) {
     const array = [...this.toDoItems, data];
-    this.toDoItems = array; //в Конец (не менять ссылку)!
+    const toDoItemIndex = array.indexOf(data);
 
-    const toDoItemIndex = this.toDoItems.indexOf(data);
-    this.toDoItems[toDoItemIndex].toggle = false;
-    this.toDoItems[toDoItemIndex].id = IdGenerator.getNewId();
-    this.toDoItems[toDoItemIndex].tags = `#${this.toDoItems[toDoItemIndex].tags
-      .split(/\s+|,\s+|,+/gi)
-      .reduce((sum, current) => sum + ' #' + current)}`;
+    if ('id' in data) {
+      const toDoItem = array[toDoItemIndex]; //сомневаюсь тут
 
-    // Дополнительно для LocalStorage
-    this.toDoItems[toDoItemIndex].todoNumber = toDoItemIndex + 1;
+      this.toDoItems = array;
+      this.renderToDoItem(toDoItem, () => {this.onMarkAsDone(toDoItem);}, () => {this.removeElementById(toDoItem.id);});
+    } else {
+      array[toDoItemIndex].id = IdGenerator.getNewId();
+      array[toDoItemIndex].tags = `${array[toDoItemIndex].tags
+        .split(/\s+|,\s+|,+/gi)}`;
 
-    const toDoItem = this.toDoItems[toDoItemIndex];
-    localStorage.setItem(`todo №${toDoItem.todoNumber}`, toDoItem); // к строке
+      array[toDoItemIndex].todoNumber = toDoItemIndex + 1;
 
-    this.renderToDoItem(toDoItem);
+      const toDoItem = array[toDoItemIndex]; //сомневаюсь тут
+
+      this.toDoItems = array;
+      toDoSaver.setToDoItems(this.toDoItems);
+      this.renderToDoItem(toDoItem, () => {this.onMarkAsDone(toDoItem);}, () => {this.removeElementById(toDoItem.id);});
+    }
   }
 }
 
+class ToDoSaver {
+  // getToDoItems() {
+  //   for (let i = 0; i < localStorage.length; i++) {
+  //     toDoList.addElement(JSON.parse(localStorage.getItem(`Task №${i + 1}`)));
+  //   }
+  // }
+
+  setToDoItems(array) {
+    const localArray = [...array];
+    for (let i = 0; i < array.length; i++) {
+      localStorage.setItem(`Task №${localArray[i].todoNumber}`, `${JSON.stringify(localArray[i])}`);
+    }
+  }
+
+  removeToDoItems(element) {
+    localStorage.removeItem(`Task №${element.todoNumber}`);
+  }
+}
+
+
 const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
+const toDoSaver = new ToDoSaver();
+
 
 toDoForm.setOnSubmit((data) => {
   toDoList.addElement(data);
 });
 
-// 1. Теория: Что такое генераторы (генератор случайных чисел);
+// 1. Теория: Что такое генераторы (генератор случайных чисел) +-;
 // 2. Добиваю практику:
 //    - class ToDoSaver для работы с localStorage;
-//    - перенос вызова toDoItems = array в конец, так же замена работы функции на работу с array;
-//    - добавить поле element со ссылкой на DOM-элемент;
-//    - запись id как data-attribute (закончить с удалением по id);
-//    - реализовать onMarkAsDone в renderToDoItem;
+//    - перенос вызова toDoItems = array в конец, так же замена работы функции на работу с array; +
+//    - добавить поле element со ссылкой на DOM-элемент; +
+//    - запись id как data-attribute (закончить с удалением по id); +
+//    - реализовать onMarkAsDone в renderToDoItem; +-
 //
 //                    СПЕРВА node.js!!!
 //
