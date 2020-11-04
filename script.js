@@ -41,8 +41,6 @@ class ToDoForm {
     // Create <form> in DOM;
     let form = document.createElement('form');
     form.classList.add('form');
-    form.method = 'post';
-    form.action = 'http://localhost:3000/todos';
     this.rootElement.append(form);
     this.form = form;
 
@@ -96,7 +94,7 @@ class ToDoForm {
 
     // Create <button> for create ToDo items in DOM;
     let submitButton = document.createElement('button');
-    submitButton.type = 'submit';
+    submitButton.type = 'button';
     submitButton.textContent = 'Create';
     submitButton.classList.add('button');
 
@@ -135,7 +133,6 @@ class ToDoForm {
       this.submitFunc(obj);
     }
   }
-  // 1. setOnSubmit Должен принимать функцию
 }
 
 class ToDoList {
@@ -149,6 +146,16 @@ class ToDoList {
     this.list = list;
 
     this.toDoItems = [...initialState];
+
+    if (toDoSaver.getToDoItems()) {
+      this.toDoItems = toDoSaver.getToDoItems();
+      this.toDoItems.forEach(item => {
+        this.renderToDoItem(item,
+          () => this.onMarkAsDone(item),
+          () => this.removeElementById(item.id)
+        );
+      });
+    }
   }
 
   get toDoItems() {
@@ -164,12 +171,6 @@ class ToDoList {
   checkIsEmpty() {
     if (!this.toDoItems || this.toDoItems.length === 0) {
       this.renderEmptyLabel();
-      // if (localStorage.length === 0) {
-      //   this.renderEmptyLabel();
-      // } else {
-      //   this.deleteEmptyLabel();
-      //   toDoSaver.getToDoItems();
-      // }
     } else {
       this.deleteEmptyLabel();
     }
@@ -185,7 +186,9 @@ class ToDoList {
   }
 
   deleteEmptyLabel() {
-    this.empty.remove();
+    if (this.empty) {
+      this.empty.remove();
+    }
   }
 
   // renderToDoItems() {
@@ -221,7 +224,7 @@ class ToDoList {
 
     toDo.dataset.id = toDoItem.id;
     toDoName.textContent = `${toDoItem.name}`;
-    toDoTags.textContent = `${toDoItem.tags}`; // работать с массивом тут!!!!!!
+    toDoTags.textContent = `#${toDoItem.tags.join(' #')}`;
 
     toDoCheckbox.addEventListener('click', onMarkAsDone);
     toDoDeleteButton.addEventListener('click', removeElementById);
@@ -258,13 +261,6 @@ class ToDoList {
       }
       return element.id != id;
     });
-
-    // 1. Вместо массива toDos - записываем в поле element сам DOM-элемент +
-    // 2. Переписываем функцию под filter +
-    // для удаления элемента (через remove если поле element есть) или если этого поля нет (начинаем искать с
-    // помощью селектора); +-
-    // Новый класс для (localStorage) ToDoSaver (getToDoItems и setToDoItems(array));
-
     // ВСЕГДА работаем от данных! Исходя из состояния!
   }
 
@@ -273,8 +269,7 @@ class ToDoList {
     const toDoItemIndex = array.indexOf(data);
 
     array[toDoItemIndex].id = IdGenerator.getNewId();
-    array[toDoItemIndex].tags = `${array[toDoItemIndex].tags.split(/\s+|,\s+|,+/gi)}`;
-    array[toDoItemIndex].todoNumber = toDoItemIndex + 1;
+    array[toDoItemIndex].tags = array[toDoItemIndex].tags.split(/\s+|,\s+|,+/gi);
 
     const toDoItem = array[toDoItemIndex];
     const toDoElement = this.renderToDoItem(toDoItem,
@@ -290,27 +285,24 @@ class ToDoList {
 }
 
 class ToDoSaver {
-  // getToDoItems() {
-  //   for (let i = 0; i < localStorage.length; i++) {
-  //     toDoList.addElement(JSON.parse(localStorage.getItem(`Task №${i + 1}`)));
-  //   }
-  // }
+  getToDoItems() {
+    return JSON.parse(localStorage.getItem('todos'));
+  }
 
   setToDoItems(array) {
     const localArray = [...array];
-    for (let i = 0; i < array.length; i++) {
-      localStorage.setItem(`Task №${localArray[i].todoNumber}`, `${JSON.stringify(localArray[i])}`);
-    }
+    localStorage.setItem('todos', JSON.stringify(localArray));
   }
 
   removeToDoItems(element) {
-    localStorage.removeItem(`Task №${element.todoNumber}`);
+    localStorage.removeItem(); //додумать
   }
 }
 
+const toDoSaver = new ToDoSaver();
 const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
-const toDoSaver = new ToDoSaver();
+
 
 toDoForm.setOnSubmit((data) => {
   toDoList.addElement(data);

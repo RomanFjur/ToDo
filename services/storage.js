@@ -1,20 +1,30 @@
 class StorageService {
   constructor() {
-    fetch('/todos.json')
-      .then(response => response.json)
-      .then(data => this.data = data);
-    // 1. считать файл (тут должен быть fetch.api)
-    // 2. записать его в this.data
-    console.log(this.data);
+    this.data = [];
   }
 
-  find(id) {
+  find(data) {
+
     // либо брать id (если есть) и находить todo по id
     // если нет id возвращать this.data
   }
 
   save(todos) {
-    this.data.push(todos);
+    async function postData(url = '', todos = {}) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(todos)
+      });
+      return await response.json();
+    }
+
+    postData('/todos.json', todos)
+      .then((todos) => {
+        console.log(todos);
+      });
   }
 
   update(todo) {
