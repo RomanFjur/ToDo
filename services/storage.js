@@ -1,7 +1,11 @@
 class StorageService {
   constructor() {
-    // 1. считать файл
+    fetch('/todos.json')
+      .then(response => response.json)
+      .then(data => this.data = data);
+    // 1. считать файл (тут должен быть fetch.api)
     // 2. записать его в this.data
+    console.log(this.data);
   }
 
   find(id) {
@@ -10,13 +14,16 @@ class StorageService {
   }
 
   save(todos) {
-    // записать в this.data
-    // записать в файл
+    this.data.push(todos);
   }
 
   update(todo) {
     // обновить в this.data
-    // обновленный this.data сохранить в файл 
+    // обновленный this.data сохранить в файл
+  }
+
+  delete() {
+
   }
 }
 

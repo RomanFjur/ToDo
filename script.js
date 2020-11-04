@@ -41,6 +41,8 @@ class ToDoForm {
     // Create <form> in DOM;
     let form = document.createElement('form');
     form.classList.add('form');
+    form.method = 'post';
+    form.action = 'http://localhost:3000/todos';
     this.rootElement.append(form);
     this.form = form;
 
@@ -52,6 +54,7 @@ class ToDoForm {
     let nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.id = 'name';
+    nameInput.name = 'name';
     nameInput.placeholder = 'My new todo';
     nameInput.classList.add('input');
     this.form.append(nameLabel);
@@ -75,6 +78,7 @@ class ToDoForm {
     let tagsInput = document.createElement('input');
     tagsInput.type = 'text';
     tagsInput.id = 'tags';
+    tagsInput.name = 'tags';
     tagsInput.placeholder = 'todo, important, other...';
     tagsInput.classList.add('input');
     this.form.append(tagsLabel);
@@ -92,7 +96,7 @@ class ToDoForm {
 
     // Create <button> for create ToDo items in DOM;
     let submitButton = document.createElement('button');
-    submitButton.type = 'button';
+    submitButton.type = 'submit';
     submitButton.textContent = 'Create';
     submitButton.classList.add('button');
 
