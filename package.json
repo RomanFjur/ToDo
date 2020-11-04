@@ -1,0 +1,25 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomanFjur/ToDo.git"
+  },
+  "keywords": [
+    "todo"
+  ],
+  "author": "Raman Zhminko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RomanFjur/ToDo/issues"
+  },
+  "homepage": "https://github.com/RomanFjur/ToDo#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

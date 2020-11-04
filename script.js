@@ -217,11 +217,12 @@ class ToDoList {
 
     toDo.dataset.id = toDoItem.id;
     toDoName.textContent = `${toDoItem.name}`;
-    toDoTags.textContent = `${toDoItem.tags}`; // работать с массивом тут
-    toDoItem.element = toDo;
+    toDoTags.textContent = `${toDoItem.tags}`; // работать с массивом тут!!!!!!
 
     toDoCheckbox.addEventListener('click', onMarkAsDone);
     toDoDeleteButton.addEventListener('click', removeElementById);
+
+    return toDo;
   }
 
   onMarkAsDone(item) {
@@ -232,21 +233,23 @@ class ToDoList {
       item.toggle = false;
       item.element.classList.toggle('toDoChecked');
     }
+    // Переписать под id
   }
 
   removeElementById(id) {
     this.toDoItems = this.toDoItems.filter((element, index) => {
-      if (element.id == id) {
+      if (element.id === id) {
         if (element.element) {
           element.element.remove();
           toDoSaver.removeToDoItems(element);
         } else {
-          this.list.querySelectorAll('.toDo').forEach((item, i) => {
-            if (item.dataset.id == id) {
+          this.list.querySelector('.toDo').forEach((item, i) => {
+            if (item.dataset.id === id) {
               item.remove();
               toDoSaver.removeToDoItems(element);
             }
           });
+          //document.querySelector(`div[data-id=${id}]`); ^
         }
       }
       return element.id != id;
@@ -265,24 +268,20 @@ class ToDoList {
     const array = [...this.toDoItems, data];
     const toDoItemIndex = array.indexOf(data);
 
-    if ('id' in data) {
-      const toDoItem = array[toDoItemIndex]; //сомневаюсь тут
+    array[toDoItemIndex].id = IdGenerator.getNewId();
+    array[toDoItemIndex].tags = `${array[toDoItemIndex].tags.split(/\s+|,\s+|,+/gi)}`;
+    array[toDoItemIndex].todoNumber = toDoItemIndex + 1;
 
-      this.toDoItems = array;
-      this.renderToDoItem(toDoItem, () => {this.onMarkAsDone(toDoItem);}, () => {this.removeElementById(toDoItem.id);});
-    } else {
-      array[toDoItemIndex].id = IdGenerator.getNewId();
-      array[toDoItemIndex].tags = `${array[toDoItemIndex].tags
-        .split(/\s+|,\s+|,+/gi)}`;
+    const toDoItem = array[toDoItemIndex];
+    const toDoElement = this.renderToDoItem(toDoItem,
+      () => this.onMarkAsDone(toDoItem),
+      () => this.removeElementById(toDoItem.id)
+    );
 
-      array[toDoItemIndex].todoNumber = toDoItemIndex + 1;
+    array[toDoItemIndex].element = toDoElement;
 
-      const toDoItem = array[toDoItemIndex]; //сомневаюсь тут
-
-      this.toDoItems = array;
-      toDoSaver.setToDoItems(this.toDoItems);
-      this.renderToDoItem(toDoItem, () => {this.onMarkAsDone(toDoItem);}, () => {this.removeElementById(toDoItem.id);});
-    }
+    this.toDoItems = array;
+    toDoSaver.setToDoItems(this.toDoItems);
   }
 }
 
@@ -305,11 +304,9 @@ class ToDoSaver {
   }
 }
 
-
 const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
 const toDoSaver = new ToDoSaver();
-
 
 toDoForm.setOnSubmit((data) => {
   toDoList.addElement(data);
@@ -317,7 +314,7 @@ toDoForm.setOnSubmit((data) => {
 
 // 1. Теория: Что такое генераторы (генератор случайных чисел) +-;
 // 2. Добиваю практику:
-//    - class ToDoSaver для работы с localStorage;
+//    - class ToDoSaver для работы с localStorage; - (Доработать! Сделать его простым)
 //    - перенос вызова toDoItems = array в конец, так же замена работы функции на работу с array; +
 //    - добавить поле element со ссылкой на DOM-элемент; +
 //    - запись id как data-attribute (закончить с удалением по id); +
@@ -328,3 +325,10 @@ toDoForm.setOnSubmit((data) => {
 // 3. https://tproger.ru/translations/javascript-important-concepts/
 // 4. https://proglib.io/p/beginners-guide-to-node-js/
 // 5. https://nodejs.dev/learn/introduction-to-nodejs
+
+// у ToDoList (в конструкторе функция rehydrate);
+//  - считать с помощью toDoSaver
+//  - заменить this.toDoItems
+//  - отрисовать (рендер)
+//  1. Закончить практику
+//  2. Express
