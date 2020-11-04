@@ -1,7 +1,8 @@
 const express = require('express');
 const fs = require('fs');
-const StorageService = require('./services/storage.js');
 const bodyParser = require('body-parser');
+const fetchApi = require('node-fetch');
+const StorageService = require('./services/storage.js');
 const app = express();
 const port = 3000;
 const storageService = new StorageService();
