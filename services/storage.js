@@ -1,38 +1,58 @@
+const fs = require('fs');
+const DB_PATH = './db/todos.json';
+
 class StorageService {
   constructor() {
     this.data = [];
   }
 
-  find(data) {
+  find(id) {
+    this.data = JSON.parse(fs.readFileSync(DB_PATH, {encoding: 'utf-8'}, (error, data) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(data);
+      }
+    }));
 
+    let todo;
+
+    if (id) {
+      todo = this.data.filter((obj) => {
+        return obj.id === id;
+      });
+      return todo;
+    } else {
+      return this.data;
+    }
     // либо брать id (если есть) и находить todo по id
     // если нет id возвращать this.data
   }
 
-  save(todos) {
-    async function postData(url = '', todos = {}) {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(todos)
-      });
-      return await response.json();
+  save(data) {
+    let todo = data;
+    // try catch
+    try {
+      if (Array.isArray(todo)) {
+        this.data = todo;
+        fs.writeFile(DB_PATH, JSON.stringify(this.data), () => {});
+      } else {
+        this.data.push(todo);
+        fs.writeFile(DB_PATH, JSON.stringify(this.data), () => {});
+      }
+    } catch (err) {
+      console.error(err);
     }
-
-    postData('/todos.json', todos)
-      .then((todos) => {
-        console.log(todos);
-      });
+    // data - либо массив, либо объект
+    return todo; // возвращать
   }
 
-  update(todo) {
+  update(id, data) {
     // обновить в this.data
     // обновленный this.data сохранить в файл
   }
 
-  delete() {
+  delete(id) {
 
   }
 }
