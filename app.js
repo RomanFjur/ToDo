@@ -23,16 +23,8 @@ app.get(`/todos`, (req, res) => {
 });
 
 app.get(`/todos/:toDoId`, (req, res) => {
-  const {name, tags, id} = req.params;
-  const todos = storageService.find();
-  let todo = null;
-
-  for (let i = 0; i < todos.length; i++) {
-    if (todos[i].id == id) {
-      todo = todo[i];
-      break;
-    }
-  }
+  const {toDoId} = req.params;
+  const todo = storageService.find(toDoId);
 
   if (todo) {
     res.send(todo);
@@ -44,11 +36,18 @@ app.get(`/todos/:toDoId`, (req, res) => {
 // ------
 
 app.put(`/todos/:toDoId`, (req, res) => {
+  const {toDoId} = req.params;
+  const {name, tags} = req.body;
+  storageService.update(toDoId, {name, tags});
 
+  res.send(200);
 });
 
 app.delete(`/todos/:toDoId`, (req, res) => {
+  const {toDoId} = req.params;
+  storageService.delete(toDoId);
 
+  res.send(200);
 });
 
 app.listen(port, () => {
