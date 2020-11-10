@@ -11,8 +11,7 @@ app.use(bodyParser.json());
 
 app.post(`/todos`, (req, res) => {
   const todos = storageService.find();
-  // сначала find, потом в todos добавить todo
-  const {name, tags, id = IdGenerator.getNewId()} = req.body; // деструктуризация
+  const {name, tags, id = IdGenerator.getNewId()} = req.body;
   const todo = storageService.save({name, tags, id});
   res.send(todo);
 });
@@ -25,7 +24,6 @@ app.get(`/todos`, (req, res) => {
 app.get(`/todos/:toDoId`, (req, res) => {
   const {toDoId} = req.params;
   const todo = storageService.find(toDoId);
-
   if (todo) {
     res.send(todo);
   } else {
@@ -33,20 +31,16 @@ app.get(`/todos/:toDoId`, (req, res) => {
   }
 });
 
-// ------
-
 app.put(`/todos/:toDoId`, (req, res) => {
   const {toDoId} = req.params;
   const {name, tags} = req.body;
   storageService.update(toDoId, {name, tags});
-
   res.send(200);
 });
 
 app.delete(`/todos/:toDoId`, (req, res) => {
   const {toDoId} = req.params;
   storageService.delete(toDoId);
-
   res.send(200);
 });
 

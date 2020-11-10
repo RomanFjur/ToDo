@@ -12,21 +12,17 @@ class StorageService {
       }
     }));
     this.data = Array.isArray(this.data) ? this.data : [];
-    //перенести сюда this.data = DB_PATH
   }
 
   find(id) {
     if (id) {
-      return this.data.find((item) => item.id === id); //нужно вернуть объект (через find)
+      return this.data.find((item) => item.id === id);
     } else {
       return this.data;
     }
-    // либо брать id (если есть) и находить todo по id
-    // если нет id возвращать this.data
   }
 
   save(data) {
-    // try catch
     try {
       if (Array.isArray(data)) {
         this.data = data;
@@ -37,8 +33,7 @@ class StorageService {
     } catch (err) {
       console.error(err);
     }
-    // data - либо массив, либо объект
-    return data; // возвращать
+    return data;
   }
 
   update(id, data) {
@@ -65,7 +60,7 @@ class StorageService {
   delete(id) {
     this.data = this.data.filter((obj) => obj.id !== id);
     // сделать через splice и findIndex
-    // Внимательно смотреть за итерацией
+    // Внимательно смотреть за итерацией!!!
 
     updateDB(this.data);
     return this.data;
