@@ -275,23 +275,4 @@ toDoForm.setOnSubmit((data) => {
   toDoList.addElement(data);
 });
 
-// 1. Теория: Что такое генераторы (генератор случайных чисел) +-;
-// 2. Добиваю практику:
-//    - class ToDoSaver для работы с localStorage; - (Доработать! Сделать его простым)
-//    - перенос вызова toDoItems = array в конец, так же замена работы функции на работу с array; +
-//    - добавить поле element со ссылкой на DOM-элемент; +
-//    - запись id как data-attribute (закончить с удалением по id); +
-//    - реализовать onMarkAsDone в renderToDoItem; +-
-//
-//                    СПЕРВА node.js!!!
-//
-// 3. https://tproger.ru/translations/javascript-important-concepts/
-// 4. https://proglib.io/p/beginners-guide-to-node-js/
-// 5. https://nodejs.dev/learn/introduction-to-nodejs
-
-// у ToDoList (в конструкторе функция rehydrate);
-//  - считать с помощью toDoSaver
-//  - заменить this.toDoItems
-//  - отрисовать (рендер)
-//  1. Закончить практику
-//  2. Express
+// нужен класс HTTPClient

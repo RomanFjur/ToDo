@@ -56,8 +56,8 @@ class StorageService {
   }
 
   delete(id) {
-    const deletedTodo = this.data.findIndex((obj) => obj.id === id);
-    this.data.splice(deletedTodo, 1);
+    const foundedIndex = this.data.findIndex((obj) => obj.id === id);
+    this.data.splice(foundedIndex, 1);
 
     // Внимательно смотреть за итерацией!!!
 
