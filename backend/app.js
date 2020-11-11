@@ -9,6 +9,12 @@ const IdGenerator = require('./utils.js');
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
 
+app.use((req, res) => {
+  res.sendFile(process.cwd() + "/frontend/public/index.html"); 
+  /* __dirname не работает тут, так как ссылается на текущее расположение файла app.js, а index.html у нас 
+  расположен в другой директории; */
+});
+
 app.post(`/todos`, (req, res) => {
   const todos = storageService.find();
   const {name, tags, id = IdGenerator.getNewId()} = req.body;
