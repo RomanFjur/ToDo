@@ -16,7 +16,7 @@ class StorageService {
 
   find(id) {
     if (id) {
-      return this.data.find((item) => item.id === id);
+      return this.data.find((item) => item.id === id); 
     } else {
       return this.data;
     }
@@ -53,13 +53,12 @@ class StorageService {
 
     updateDB(this.data);
     return this.data[toDoIndex];
-    // обновить в this.data
-    // обновленный this.data сохранить в файл
   }
 
   delete(id) {
-    this.data = this.data.filter((obj) => obj.id !== id);
-    // сделать через splice и findIndex
+    const deletedTodo = this.data.findIndex((obj) => obj.id === id);
+    this.data.splice(deletedTodo, 1);
+
     // Внимательно смотреть за итерацией!!!
 
     updateDB(this.data);
