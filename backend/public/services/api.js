@@ -8,7 +8,7 @@ class RequestError {
 
 // =================================================================================
 
-class HTTPClient {
+export default class HTTPClient {
   constructor(url) {
     this.baseUrl = url;
   }
@@ -16,22 +16,22 @@ class HTTPClient {
   endpoint(method, path, options) {
     // const proxyurl = "https://cors-anywhere.herokuapp.com/";
     const newUrl = this.baseUrl + path;
+
     return async (data) => {
-      fetch(newUrl, {
-        method
-      });
+      try {
+        const response = await fetch(newUrl, {
+          method
+        });
+        if (response.ok) {
+          const json = await response.json();
+          console.log(json);
+          return json;
+        } else {
+          throw new RequestError(response.status(), `: ошибка ${response.status()}`, response)
+        }
+      } catch (error) {
+        console.log(error);
+      }
     };
+  }
 }
-
-// const client = new HTTPClient('http://localhost:3000');
-
-// const endpointGetToDos = client.endpoint('GET', '/todos', {normalizer: (data) => {}});
-// const endpointCreateToDo = client.endpoint('POST', '/todos');
-
-// const toDos = await endpointGetToDos();
-
-// try {
-  
-// } catch (error) {
-//   console.log(error);
-// }

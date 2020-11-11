@@ -6,13 +6,11 @@ const port = 3000;
 const storageService = new StorageService();
 const IdGenerator = require('./utils.js');
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
-app.use((req, res) => {
-  res.sendFile(process.cwd() + "/frontend/public/index.html"); 
-  /* __dirname не работает тут, так как ссылается на текущее расположение файла app.js, а index.html у нас 
-  расположен в другой директории; */
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + "/public/index.html"); 
 });
 
 app.post(`/todos`, (req, res) => {

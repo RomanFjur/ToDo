@@ -1,4 +1,18 @@
-// import './services/api.js';
+import HTTPClient from '/services/api.js';
+
+const client = new HTTPClient('http://localhost:3000');
+
+const endpointGetToDos = client.endpoint('GET', '/todos', {normalizer: (data) => {}});
+// const endpointCreateToDo = client.endpoint('POST', '/todos');
+
+try {
+  (async () => {
+    const toDos = await endpointGetToDos();
+    console.log(toDos);
+  })();
+} catch (error) {
+  
+}
 
 class ToDoForm {
   constructor (selector) {
