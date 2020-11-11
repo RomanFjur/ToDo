@@ -1,5 +1,5 @@
 const fs = require('fs');
-const DB_PATH = './db/todos.json';
+const DB_PATH = './backend/db/todos.json';
 const updateDB = (data) => fs.writeFileSync(DB_PATH, JSON.stringify(data), () => {});
 
 class StorageService {
