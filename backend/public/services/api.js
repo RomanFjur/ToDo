@@ -14,23 +14,34 @@ export default class HTTPClient {
   }
 
   endpoint(method, path, options) {
-    // const proxyurl = "https://cors-anywhere.herokuapp.com/";
     const newUrl = this.baseUrl + path;
 
     return async (data) => {
       try {
         const response = await fetch(newUrl, {
-          method
+          method,
+          headers: {
+			      'Content-Type': 'application/json'
+		      },
+          body: JSON.stringify(data)
         });
+        // описать логику по ошибкам после try/catch
         if (response.ok) {
           const json = await response.json();
-          console.log(json);
           return json;
         } else {
-          throw new RequestError(response.status(), `: ошибка ${response.status()}`, response)
+          if (response.status === 404) {
+            // переписать выброс ошибки отдельно внизу
+            throw new RequestError(response.status, `Error: ${response.status} Not found`, response.body); 
+            // проверить response.body приходящий от сервера
+          } else if (response.status === 500) {
+            throw new RequestError(response.status, `Error: ${response.status} Internal Server Error`, response);
+          } else {
+            throw new RequestError(response.status, `Error: ${response.status} Request Error`, response);
+          }
         }
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
       }
     };
   }

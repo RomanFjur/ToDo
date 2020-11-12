@@ -13,6 +13,8 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + "/public/index.html"); 
 });
 
+// написать отдельный endpoint (get запрос '/test')
+
 app.post(`/todos`, (req, res) => {
   const todos = storageService.find();
   const {name, tags, id = IdGenerator.getNewId()} = req.body;
