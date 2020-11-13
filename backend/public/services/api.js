@@ -1,12 +1,10 @@
 class RequestError {
   constructor(statusCode, message, data) {
     this.statusCode = statusCode; // Статус-код не равный 200 (404, 500 и тд)
-    this.message = message; // Сообщение об ошибке (расшифровка статус-кода ошибки)
+    this.message = `Request Error: ${message}`; // Сообщение об ошибке (расшифровка статус-кода ошибки)
     this.data = data; // Данные, переданные вместе с ошибкой
   }
 }
-
-// =================================================================================
 
 export default class HTTPClient {
   constructor(url) {
@@ -14,10 +12,26 @@ export default class HTTPClient {
   }
 
   endpoint(method, path, options) {
-    const newUrl = this.baseUrl + path;
+    let newUrl = this.baseUrl + path;
 
-    return async (data) => {
+    return async (data = undefined) => {
       try {
+
+        const regToDoId = /:toDoId/gi;
+        const regId = /toDoId/gi;
+
+        if (newUrl.match(regToDoId)) {
+          // перебор объекта data для получения id
+          const keyValues = Object.entries(data);
+          const idValues = keyValues.filter(arr => {
+            return arr[0].match(regId);
+          });
+          const newValues = idValues.map(arr => arr[1]);
+          console.log(newValues);
+
+          // доделать!!!
+        }
+
         const response = await fetch(newUrl, {
           method,
           headers: {
@@ -25,21 +39,13 @@ export default class HTTPClient {
 		      },
           body: JSON.stringify(data)
         });
-        // описать логику по ошибкам после try/catch
         if (response.ok) {
-          const json = await response.json();
+          const json = await response.json(); // при put и delete будет возвращать ошибку (не может привести в json)
           return json;
         } else {
-          if (response.status === 404) {
-            // переписать выброс ошибки отдельно внизу
-            throw new RequestError(response.status, `Error: ${response.status} Not found`, response.body); 
-            // проверить response.body приходящий от сервера
-          } else if (response.status === 500) {
-            throw new RequestError(response.status, `Error: ${response.status} Internal Server Error`, response);
-          } else {
-            throw new RequestError(response.status, `Error: ${response.status} Request Error`, response);
-          }
+          throw new RequestError(response.status, `${response.status}`, response.bodyUsed);
         }
+
       } catch (error) {
         console.log(error.message);
       }

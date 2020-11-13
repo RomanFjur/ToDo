@@ -57,9 +57,10 @@ class StorageService {
 
   delete(id) {
     const foundedIndex = this.data.findIndex((obj) => obj.id === id);
-    this.data.splice(foundedIndex, 1);
 
-    // Внимательно смотреть за итерацией!!!
+    if (foundedIndex != -1) {
+      this.data.splice(foundedIndex, 1);
+    }
 
     updateDB(this.data);
     return this.data;

@@ -4,19 +4,19 @@ const client = new HTTPClient('http://localhost:3000');
 
 const endpointGetToDos = client.endpoint('GET', '/todos', {normalizer: (data) => {}});
 const endpointCreateToDo = client.endpoint('POST', '/todos');
-const endpointUpdateToDo = client.endpoint('PUT', '/todos'); // подавать сюда необходимый id и изменяемые данные
-const endpointDeleteToDo = client.endpoint('DELETE', '/todos/:toDoId'); // совсем не всё
+const endpointUpdateToDo = client.endpoint('PUT', '/todos/:toDoId'); 
+// подавать сюда необходимый id и изменяемые данные
+const endpointDeleteToDo = client.endpoint('DELETE', '/todos/:toDoId');
 
 try {
-  // Вопрос по асинхроной функции
   (async () => {
-    const toDo = await endpointCreateToDo({name: "Evelina", tags: [777,77,7]});
+    // const toDo = await endpointCreateToDo({name: "Evelina", tags: [777,77,7]});
     // const updateToDo = await endpointUpdateToDo();
-    const delToDo = await endpointDeleteToDo({toDoId: "do8qlp5kt5"});
+    const delToDo = await endpointDeleteToDo({toDoId: 'h4xech721d', name: 'Roman', tags: [1,1,1]});
     // если есть toDoId поле, toDoId нужно удалять (не должно быть в body)
     // если объект пуст для отправки в body - body должен быть пуст (undefined)
     const toDos = await endpointGetToDos();
-    console.log(toDos, toDo);
+    console.log(toDos);
   })(); 
 } catch (error) {
   console.log(error);
