@@ -19,17 +19,26 @@ export default class HTTPClient {
 
         const regToDoId = /:toDoId/gi;
         const regId = /toDoId/gi;
+        const regName = /name/gi;
+        const regTags = /tags/gi;
 
         if (newUrl.match(regToDoId)) {
-          // перебор объекта data для получения id
-          const keyValues = Object.entries(data);
-          const idValues = keyValues.filter(arr => {
-            return arr[0].match(regId);
-          });
-          const newValues = idValues.map(arr => arr[1]);
-          console.log(newValues);
+          
+          const arrFromDataObject = Object.entries(data);
 
-          // доделать!!!
+          const idEntriesFromData = arrFromDataObject.find(arr => arr[0].match(regId));
+          const idIndex = arrFromDataObject.findIndex(arr => arr[0].match(regId));
+          const toDoId = idEntriesFromData[1].toString();
+          newUrl = newUrl.replace(regToDoId, toDoId);
+
+
+          arrFromDataObject.splice(idIndex, 1);
+          data = Object.fromEntries(arrFromDataObject);
+
+          // Check for empty 'data'-object
+          if (Object.keys(data).length == 0) {
+            data = undefined;
+          }
         }
 
         const response = await fetch(newUrl, {
