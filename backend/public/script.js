@@ -4,21 +4,8 @@ const client = new HTTPClient('http://localhost:3000');
 
 const endpointGetToDos = client.endpoint('GET', '/todos', {normalizer: (data) => {}});
 const endpointCreateToDo = client.endpoint('POST', '/todos');
-const endpointUpdateToDo = client.endpoint('PUT', '/todos/:toDoId'); 
-// подавать сюда необходимый id и изменяемые данные
+const endpointUpdateToDo = client.endpoint('PUT', '/todos/:toDoId');
 const endpointDeleteToDo = client.endpoint('DELETE', '/todos/:toDoId');
-
-try {
-  (async () => {
-    // const toDo = await endpointCreateToDo({name: "Evelina", tags: [777,77,7]});
-    // const updateToDo = await endpointUpdateToDo({toDoId: 'h4xech721d', name: 'Roman', tags: [1,1,1]});
-
-    /* если есть toDoId поле, toDoId нужно удалять (не должно быть в body)
-    если объект пуст для отправки в body - body должен быть пуст (undefined) */
-  })(); 
-} catch (error) {
-  console.log(error);
-}
 
 class ToDoForm {
   constructor (selector) {
@@ -177,7 +164,7 @@ class ToDoList {
   renderToDoItems(toDoItems) {
     toDoItems.forEach((item) => {
       this.renderToDoItem(item,
-        () => this.onMarkAsDone(item),
+        () => this.onMarkAsDone(item, item.id),
         () => this.removeElementById(item.id)
       );
     });
@@ -220,57 +207,34 @@ class ToDoList {
     return toDo;
   }
 
-  onMarkAsDone(item) {
-    if (item.toggle === false || item.toggle === undefined) {
-      item.toggle = true;
-      item.element.classList.toggle('toDoChecked');
-    } else {
-      item.toggle = false;
-      item.element.classList.toggle('toDoChecked');
-    }
-    // Переписать под id
+  onMarkAsDone(item, id) {
+    document.querySelector(`[data-id="${id}"]`).classList.toggle('toDoChecked');
   }
 
   removeElementById(id) {
-    this.toDoItems = this.toDoItems.filter((element, index) => {
-      console.log(id);
-      if (element.id === id) {
-        if (element.element) {
-          element.element.remove();
-          (async () => {
-            const delToDo = await endpointDeleteToDo({toDoId: id});
-          })();
-        } else {
-          this.list.querySelector('.toDo').forEach((item, i) => {
-            if (item.dataset.id === id) {
-              item.remove();
-              (async () => {
-                const delToDo = await endpointDeleteToDo({toDoId: id});
-              })();
-            }
-          });
-          //document.querySelector(`div[data-id=${id}]`); ^
-        }
-      }
-      return element.id != id;
-    });
+    const deleteIndex = this.toDoItems.findIndex(todo => todo.id === id);
+    this.toDoItems.splice(deleteIndex, 1);
+
+    this.toDoItems = this.toDoItems;
+
+    document.querySelector(`[data-id="${id}"]`).remove();
+
+    (async () => {
+      await endpointDeleteToDo({toDoId: id});
+    })();
+
     // ВСЕГДА работаем от данных! Исходя из состояния!
   }
 
   addElement(data) {
     const array = [...this.toDoItems, data];
     const toDoItemIndex = array.indexOf(data);
-
+    
     const toDoItem = array[toDoItemIndex];
     const toDoElement = this.renderToDoItem(toDoItem,
-      () => this.onMarkAsDone(toDoItem),
+      () => this.onMarkAsDone(toDoItem, toDoItem.id),
       () => this.removeElementById(toDoItem.id)
     );
-
-    array[toDoItemIndex].element = toDoElement; //переписать, разобраться с id
-    (async () => {
-      const todo = await endpointCreateToDo(array[toDoItemIndex]);
-    })();
 
     this.toDoItems = array;
   }
@@ -278,16 +242,12 @@ class ToDoList {
 
 class ToDoSaver {
   getToDoItems() {
-    
   }
 
   setToDoItems(array) {
-    const localArray = [...array];
-    
   }
 
-  removeToDoItems(element) {
-    
+  removeToDoItems(id) {
   }
 }
 
@@ -296,9 +256,7 @@ const toDoForm = new ToDoForm(() => document.querySelector('body'));
 const toDoList = new ToDoList(() => document.querySelector('body'));
 
 
-toDoForm.setOnSubmit((data) => {
-  // const todo = await endpointCreateToDo(data); Сперва было так, но лучше иначе сделать
-  toDoList.addElement(data);
+toDoForm.setOnSubmit(async (data) => {
+  const todo = await endpointCreateToDo(data);
+  toDoList.addElement(todo);
 });
-
-// нужен класс HTTPClient
