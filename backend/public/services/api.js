@@ -12,33 +12,34 @@ export default class HTTPClient {
   }
 
   endpoint(method, path, options) {
-    let newUrl = this.baseUrl + path;
 
     return async (data = undefined) => {
-      try {
+      let newUrl = this.baseUrl + path;
 
-        const regToDoId = /:toDoId/gi;
-        const regId = /toDoId/gi;
-        const regName = /name/gi;
-        const regTags = /tags/gi;
+      try {
+        const regToDoId = /:[a-z]{1,}/gi;
 
         if (newUrl.match(regToDoId)) {
+
+          const findableKeys = newUrl.match(regToDoId);
           
-          const arrFromDataObject = Object.entries(data);
+          let rewriteKeys = findableKeys.map(str => str.split(''));
+          rewriteKeys.map(str => str.splice(0, 1));
+          rewriteKeys = rewriteKeys.map(str => str.join('').toLowerCase());
 
-          const idEntriesFromData = arrFromDataObject.find(arr => arr[0].match(regId));
-          const idIndex = arrFromDataObject.findIndex(arr => arr[0].match(regId));
-          const toDoId = idEntriesFromData[1].toString();
-          newUrl = newUrl.replace(regToDoId, toDoId);
-
-
-          arrFromDataObject.splice(idIndex, 1);
-          data = Object.fromEntries(arrFromDataObject);
-
-          // Check for empty 'data'-object
-          if (Object.keys(data).length == 0) {
+          if (typeof data != 'object') {
+            newUrl = newUrl.replace(regToDoId, data);
             data = undefined;
+          } else {
+            for (let key in data) {
+              for (let i = 0; i < rewriteKeys.length; i++) {
+                if (rewriteKeys[i].indexOf(key) != -1) {
+                  newUrl = newUrl.replace(findableKeys[i], data[key]);
+                }
+              }
+            };
           }
+          // полностью переписать по новой
         }
 
         const response = await fetch(newUrl, {
@@ -49,7 +50,7 @@ export default class HTTPClient {
           body: JSON.stringify(data)
         });
         if (response.ok) {
-          const json = await response.json(); // при put и delete будет возвращать ошибку (не может привести в json)
+          const json = await response.json();
           return json;
         } else {
           throw new RequestError(response.status, `${response.status}`, response.bodyUsed);

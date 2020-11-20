@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const StorageService = require('./services/storage.js');
 const app = express();
-const port = 3000;
+const port = 5000;
 const storageService = new StorageService();
 const IdGenerator = require('./utils.js');
 

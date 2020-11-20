@@ -57,7 +57,6 @@ class StorageService {
 
   delete(id) {
     let foundedIndex = this.data.findIndex(obj => obj.id === id);
-    foundedIndex = undefined;
 
     if (foundedIndex != -1) {
       this.data.splice(foundedIndex, 1);

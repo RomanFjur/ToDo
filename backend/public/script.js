@@ -1,8 +1,8 @@
 import HTTPClient from '/services/api.js';
 
-const client = new HTTPClient('http://localhost:3000');
+const client = new HTTPClient('http://localhost:5000');
 
-const endpointGetToDos = client.endpoint('GET', '/todos', {normalizer: (data) => {}});
+const endpointGetToDos = client.endpoint('GET', '/todos');
 const endpointCreateToDo = client.endpoint('POST', '/todos');
 const endpointUpdateToDo = client.endpoint('PUT', '/todos/:toDoId');
 const endpointDeleteToDo = client.endpoint('DELETE', '/todos/:toDoId');
@@ -113,7 +113,7 @@ class ToDoForm {
 }
 
 class ToDoList {
-  constructor(selector) {
+  constructor(selector, initialState = []) {
     this.selector = selector;
     this.rootElement = selector();
 
@@ -122,11 +122,15 @@ class ToDoList {
     this.rootElement.append(list);
     this.list = list;
 
-    (async () => {
-      this.toDoItems = await endpointGetToDos();
-      this.renderToDoItems(this.toDoItems);
-    })();
+    this.toDoItems = [...initialState];
+    this.renderToDoItems(this.toDoItems);
+    // this.fetchToDoItems()
+    //   .then(this.renderToDoItems);
   }
+
+  // fetchToDoItems() {
+  //   return endpointGetToDos();
+  // }
 
   get toDoItems() {
     return this._toDoItems;
@@ -209,20 +213,23 @@ class ToDoList {
 
   onMarkAsDone(item, id) {
     document.querySelector(`[data-id="${id}"]`).classList.toggle('toDoChecked');
+    (async () => {
+      await endpointUpdateToDo(item);
+    })();
   }
 
   removeElementById(id) {
+    // вернуть удаление по .element!!!
     const deleteIndex = this.toDoItems.findIndex(todo => todo.id === id);
     this.toDoItems.splice(deleteIndex, 1);
 
-    this.toDoItems = this.toDoItems;
+    this.toDoItems = [...this.toDoItems];
 
     document.querySelector(`[data-id="${id}"]`).remove();
 
     (async () => {
-      await endpointDeleteToDo({toDoId: id});
+      await endpointDeleteToDo(id);
     })();
-
     // ВСЕГДА работаем от данных! Исходя из состояния!
   }
 
@@ -241,22 +248,51 @@ class ToDoList {
 }
 
 class ToDoSaver {
-  getToDoItems() {
+  async getToDoItems() {
+    try {
+      return await endpointGetToDos();
+    } catch (error) {
+      return [];
+    }
   }
 
-  setToDoItems(array) {
+  async setToDoItems(data) {
+    try {
+      return await endpointCreateToDo(data);
+    } catch (error) {
+      // silent Catch;
+    }
   }
 
-  removeToDoItems(id) {
+  async removeToDoItems(id) {
+    try {
+      return await endpointDeleteToDo(id);
+    } catch (error) {
+      // silent Catch;
+    }
+  }
+
+  async updateToDoItem(data) {
+    try {
+      return await endpointUpdateToDo(data);
+    } catch (error) {
+      // silent Catch;
+    }
   }
 }
 
-const toDoSaver = new ToDoSaver();
-const toDoForm = new ToDoForm(() => document.querySelector('body'));
-const toDoList = new ToDoList(() => document.querySelector('body'));
+(async () => {
+  const toDoSaver = new ToDoSaver();
+  const initialState = await toDoSaver.getToDoItems();
 
+  const toDoForm = new ToDoForm(() => document.querySelector('body'));
+  const toDoList = new ToDoList(() => document.querySelector('body'), initialState);
 
-toDoForm.setOnSubmit(async (data) => {
-  const todo = await endpointCreateToDo(data);
-  toDoList.addElement(todo);
-});
+  const something = await toDoSaver.updateToDoItem({"name":"Nikita","id":"niexoszplb","tags":["sur"]});
+
+  toDoForm.setOnSubmit(async (data) => {
+    const todo = await toDoSaver.setToDoItems(data);
+    toDoList.addElement(todo);
+  });
+})();
+
